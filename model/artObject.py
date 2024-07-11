@@ -24,4 +24,4 @@ class ArtObject:
 
 
     def __str__(self):
-        return f"{self.object_id} - {self.object_name}"
+        return f"{self.object_id} - {self.object_name} - {self.classification}"

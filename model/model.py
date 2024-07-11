@@ -1,3 +1,5 @@
+import copy
+
 from database.DAO import DAO
 import networkx as nx
 class Model:
@@ -8,6 +10,8 @@ class Model:
         self._idMap = {}
         for v in self._artObjectList:
             self._idMap[v.object_id] = v
+        self._solBest = []
+        self._costBest = 0
 
     def getConnessa(self, v0int):
         v0 = self._idMap[v0int]
@@ -54,9 +58,55 @@ class Model:
     def getNUmNodes(self):
         return len(self._grafo.nodes)
 
+    def getObjFromId(self, idOggetto):
+        return self._idMap[idOggetto]
 
     def getNumEdges(self):
         return len(self._grafo.edges)
 
     def checkExistence(self, idOggetto):
         return idOggetto in self._idMap
+
+    def getBestPath(self, lun, v0):
+        self._costBest = 0
+        self._solBest = []
+
+        parziale = [v0]
+
+        for v in self._grafo.neighbors(v0):
+            if v.classification == v0.classification:
+                parziale.append(v)
+                self.ricorsione(parziale, lun)
+                parziale.pop()
+
+
+        return self._solBest, self._costBest
+    def ricorsione(self, parziale, lun):
+
+        #controllo se parziale è una slz valida ed in caso se è migliore del best
+        if len(parziale) == lun:
+            if self.peso(parziale) > self._costBest:
+                self._costBest = self.peso(parziale)
+                self._solBest = copy.deepcopy(parziale)
+            return
+
+        #se arrivo qui allora len(parziale)<lun
+
+        for v in self._grafo.neighbors(parziale[-1]):
+            # v lo aggiungo se non è già in parziale e se ha la stessa classification di v0
+            if v.classification == parziale[-1].classification and v not in parziale:
+                parziale.append(v)
+                self.ricorsione(parziale, lun)
+                parziale.pop()
+
+
+
+
+    def peso(self, listObject):
+        p = 0
+
+        for i in range(0, len(listObject)-1):
+            p +=self._grafo[listObject[i]][listObject[i+1]]["weight"]
+
+        return p
+

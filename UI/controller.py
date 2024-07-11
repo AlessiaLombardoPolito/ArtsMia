@@ -36,4 +36,32 @@ class Controller:
 
         comp = self._model.getConnessa(intId)
         self._view.txt_result.controls.append(ft.Text(f"La componente connessa che contiene {intId} ha dimensione {comp}"))
+
+
+        #riempio il dd
+        self._view._ddLun.disabled = False
+        self._view._btnCercaPercorso.disabled = False
+        myOpts = list(range(2, comp))
+        myOptsDD = list(map(lambda x: ft.dropdown.Option(x), myOpts))
+        self._view._ddLun.options = myOptsDD
+
+        """alternativa se non so usare lambda
+        for i in range(2, comp):
+            self._view._ddLun.options.append(ft.dropdown.Option(i)"""
+
         self._view._page.update()
+
+
+    def handleCercaPercorso(self, e):
+        lista, costo = self._model.getBestPath(int(self._view._ddLun.value), self._model.getObjFromId(int(self._view._txtIdOggetto.value)))
+
+        self._view.txt_result.controls.clear()
+        self._view.txt_result.controls.append(ft.Text(f"percorso trovato con peso uguale a {costo}"))
+        self._view.txt_result.controls.append(ft.Text(f"percorso :"))
+        for p in lista:
+            self._view.txt_result.controls.append(ft.Text(f"{p}"))
+
+
+        self._view._page.update()
+
+
